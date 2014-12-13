@@ -30,7 +30,8 @@
     "fontawesome": "~4.1.0",
     "typeahead.js": "https://raw.githubusercontent.com/jcbrand/typeahead.js/eedfb10505dd3a20123d1fafc07c1352d83f0ab3/dist/typeahead.jquery.js",
     "strophejs-plugins": "https://github.com/strophe/strophejs-plugins.git#conversejs",
-    "skeleton-sass": "~2.0.3"
+    "skeleton-sass": "~2.0.3",
+    "neat": "~1.7.0"
   },
   "exportsOverride": {}
 }

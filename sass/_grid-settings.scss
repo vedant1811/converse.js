@@ -1,0 +1,9 @@
+@import "components/neat/app/assets/stylesheets/neat-helpers";
+
+$visual-grid: 1;
+$max-width: 100%;
+$gutter: 0.5em;
+
+// Define your breakpoints
+$tablet: new-breakpoint(max-width 768px 8);
+$mobile: new-breakpoint(max-width 480px 4);
