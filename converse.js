@@ -4670,6 +4670,11 @@
                 }
             },
 
+            /**
+             * called after register has been clicked and says whether registration was a success or not
+             * @param status
+             * @param error
+             */
             onRegistering: function (status, error) {
                 var that;
                 console.log('onRegistering');
@@ -4842,8 +4847,10 @@
                 if ($query.length > 0) {
                     $xform = $query.find('x[xmlns="'+Strophe.NS.XFORM+'"]');
                     if ($xform.length > 0) {
+                        console.log('_setFieldsFromXForm called: ' + $xform);
                         this._setFieldsFromXForm($xform);
                     } else {
+                        console.log('_setFieldsFromLegacy called: ' + $query);
                         this._setFieldsFromLegacy($query);
                     }
                 }
