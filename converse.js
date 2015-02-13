@@ -4563,6 +4563,7 @@
                         }
                     }
                 }, this);
+                // FIXME: Leads to a `Uncaught Error: A "url" property or function must be specified`
                 this.setChatmeProvider();
             },
 
@@ -4672,7 +4673,6 @@
                 var $form = $(ev.target),
                     $domain_input = $form.find('input[name=domain]'),
                     domain = $domain_input.val(),// domain to be entered, like chatme.im
-                    //domain = 'chatme.im',
                     errors = false;
                 if (!domain) {
                     $domain_input.addClass('error');
@@ -4773,7 +4773,8 @@
                         // and again before username@chatme.im
                         $form.append(utils.xForm2webForm.bind(this, $(field), $stanza));
                     }, this));
-                } else {
+                }
+                else {
                     // Show fields
                     _.each(Object.keys(this.fields), $.proxy(function (key) {
                         $form.append('<label>'+key+'</label>');
