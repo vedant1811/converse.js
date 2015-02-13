@@ -4563,6 +4563,7 @@
                         }
                     }
                 }, this);
+                this.setChatmeProvider();
             },
 
             getRegistrationFields: function (req, _callback, raw) {
@@ -4633,6 +4634,33 @@
                 }
             },
 
+            setChatmeProvider: function () {
+                console.log('setChatmeProvider called');
+                /* Callback method that gets called when the user has chosen an
+                 * XMPP provider.
+                 *
+                 * Parameters:
+                 *      (Submit Event) ev - Form submission event.
+                 */
+                //if (ev && ev.preventDefault) { ev.preventDefault(); }
+                var
+                    //$form = $(ev.target),
+                    domain = 'chatme.im',
+                    errors = false;
+                //$form.find('input[type=submit]').hide()
+                //    .after(converse.templates.registration_request({
+                //        cancel: __('Cancel'),
+                //        info_message: __('Requesting a registration form from the XMPP server')
+                //    }));
+                //$form.find('button.cancel').on('click', $.proxy(this.cancelRegistration, this));
+                this.reset({
+                    domain: Strophe.getDomainFromJid(domain),
+                    _registering: true
+                });
+                converse.connection.connect(this.domain, "", $.proxy(this.onRegistering, this));
+                return false;
+            },
+
             onProviderChosen: function (ev) {
                 /* Callback method that gets called when the user has chosen an
                  * XMPP provider.
@@ -4643,8 +4671,8 @@
                 if (ev && ev.preventDefault) { ev.preventDefault(); }
                 var $form = $(ev.target),
                     $domain_input = $form.find('input[name=domain]'),
-                    //domain = $domain_input.val(),// domain to be entered, like chatme.im
-                    domain = 'chatme.im',
+                    domain = $domain_input.val(),// domain to be entered, like chatme.im
+                    //domain = 'chatme.im',
                     errors = false;
                 if (!domain) {
                     $domain_input.addClass('error');
@@ -5206,7 +5234,8 @@
             'open': chatbox.trigger.bind(chatbox, 'show')
         };
     };
-    return {
+    // basically all these functions are public functions, that can be called via converse.funcationName
+    return{
         'initialize': function (settings, callback) {
             converse.initialize(settings, callback);
         },
