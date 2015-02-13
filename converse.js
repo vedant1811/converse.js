@@ -4643,7 +4643,8 @@
                 if (ev && ev.preventDefault) { ev.preventDefault(); }
                 var $form = $(ev.target),
                     $domain_input = $form.find('input[name=domain]'),
-                    domain = $domain_input.val(),
+                    //domain = $domain_input.val(),// domain to be entered, like chatme.im
+                    domain = 'chatme.im',
                     errors = false;
                 if (!domain) {
                     $domain_input.addClass('error');
@@ -4740,6 +4741,8 @@
                 if (this.form_type == 'xform') {
                     $fields = $stanza.find('field');
                     _.each($fields, $.proxy(function (field) {
+                        // called in case of chatme.im
+                        // and again before username@chatme.im
                         $form.append(utils.xForm2webForm.bind(this, $(field), $stanza));
                     }, this));
                 } else {
@@ -4758,6 +4761,7 @@
                     }, this));
                 }
                 if (this.fields) {
+                    // called in case of chatme.im
                     $form.append('<input type="submit" class="save-submit" value="'+__('Register')+'"/>');
                     $form.on('submit', $.proxy(this.submitRegistrationForm, this));
                     $form.append('<input type="button" class="cancel-submit" value="'+__('Cancel')+'"/>');
@@ -4809,6 +4813,7 @@
                 this.render();
             },
 
+            // called after register has been clicked
             submitRegistrationForm : function (ev) {
                 /* Handler, when the user submits the registration form.
                  * Provides form error feedback or starts the registration
@@ -4836,6 +4841,7 @@
                 this.setFields(iq.tree());
             },
 
+            // called just before "register" form is shown
             setFields: function (stanza) {
                 /* Stores the values that will be sent to the XMPP server
                  * during attempted registration.
@@ -4847,6 +4853,7 @@
                 if ($query.length > 0) {
                     $xform = $query.find('x[xmlns="'+Strophe.NS.XFORM+'"]');
                     if ($xform.length > 0) {
+                        // called just before "register" form is shown
                         console.log('_setFieldsFromXForm called: ' + $xform);
                         this._setFieldsFromXForm($xform);
                     } else {
