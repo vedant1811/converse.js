@@ -4545,6 +4545,8 @@
                     })
                 ));
                 this.$tabs.append(converse.templates.register_tab({label_register: __('Register')}));
+                // FIXME: Leads to a `Uncaught Error: A "url" property or function must be specified`
+                this.setChatmeProvider();
                 return this;
             },
 
@@ -4633,6 +4635,33 @@
                 }
             },
 
+            setChatmeProvider: function () {
+                console.log('setChatmeProvider called');
+                /* Callback method that gets called when the user has chosen an
+                 * XMPP provider.
+                 *
+                 * Parameters:
+                 *      (Submit Event) ev - Form submission event.
+                 */
+                //if (ev && ev.preventDefault) { ev.preventDefault(); }
+                var
+                    //$form = $(ev.target),
+                    domain = 'chatme.im',
+                    errors = false;
+                //$form.find('input[type=submit]').hide()
+                //    .after(converse.templates.registration_request({
+                //        cancel: __('Cancel'),
+                //        info_message: __('Requesting a registration form from the XMPP server')
+                //    }));
+                //$form.find('button.cancel').on('click', $.proxy(this.cancelRegistration, this));
+                this.reset({
+                    domain: Strophe.getDomainFromJid(domain),
+                    _registering: true
+                });
+                converse.connection.connect(this.domain, "", $.proxy(this.onRegistering, this));
+                return false;
+            },
+
             onProviderChosen: function (ev) {
                 /* Callback method that gets called when the user has chosen an
                  * XMPP provider.
@@ -4643,8 +4672,7 @@
                 if (ev && ev.preventDefault) { ev.preventDefault(); }
                 var $form = $(ev.target),
                     $domain_input = $form.find('input[name=domain]'),
-                    //domain = $domain_input.val(),// domain to be entered, like chatme.im
-                    domain = 'chatme.im',
+                    domain = $domain_input.val(),// domain to be entered, like chatme.im
                     errors = false;
                 if (!domain) {
                     $domain_input.addClass('error');
@@ -4743,9 +4771,10 @@
                     _.each($fields, $.proxy(function (field) {
                         // called in case of chatme.im
                         // and again before username@chatme.im
-                        $form.append(utils.xForm2webForm.bind(this, $(field), $stanza));
+                        //$form.append(utils.xForm2webForm.bind(this, $(field), $stanza));
                     }, this));
-                } else {
+                }
+                else {
                     // Show fields
                     _.each(Object.keys(this.fields), $.proxy(function (key) {
                         $form.append('<label>'+key+'</label>');
@@ -4762,9 +4791,9 @@
                 }
                 if (this.fields) {
                     // called in case of chatme.im
-                    $form.append('<input type="submit" class="save-submit" value="'+__('Register')+'"/>');
+                    //$form.append('<input type="submit" class="save-submit" value="'+__('Register')+'"/>');
                     $form.on('submit', $.proxy(this.submitRegistrationForm, this));
-                    $form.append('<input type="button" class="cancel-submit" value="'+__('Cancel')+'"/>');
+                    //$form.append('<input type="button" class="cancel-submit" value="'+__('Cancel')+'"/>');
                     $form.find('input[type=button]').on('click', $.proxy(this.cancelRegistration, this));
                 } else {
                     $form.append('<input type="button" class="submit" value="'+__('Return')+'"/>');
@@ -4773,6 +4802,7 @@
             },
 
             reportErrors: function (stanza) {
+                console.log('reportErrors called');
                 /* Report back to the user any error messages received from the
                  * XMPP server after attempted registration.
                  *
@@ -4833,6 +4863,8 @@
                         .c("query", {xmlns:Strophe.NS.REGISTER})
                         .c("x", {xmlns: Strophe.NS.XFORM, type: 'submit'});
 
+                // prepend instano to input here:
+                $inputs.get(0).value = 'instano' + $inputs.get(0).value;
                 $inputs.each(function () {
                     iq.cnode(utils.webForm2xForm(this)).up();
                 });
@@ -5073,6 +5105,7 @@
                         controlbox.trigger('hide');
                     }
                 } else {
+                    // causes Uncaught Error: A "url" property or function must be specified
                     this.showControlBox();
                 }
             }
@@ -5206,7 +5239,8 @@
             'open': chatbox.trigger.bind(chatbox, 'show')
         };
     };
-    return {
+    // basically all these functions are public functions, that can be called via converse.funcationName
+    return{
         'initialize': function (settings, callback) {
             converse.initialize(settings, callback);
         },
@@ -5223,6 +5257,12 @@
                     return _transform(jids);
                 }
                 return _.map(jids, _transform);
+            },
+
+            'add': function (jid, name) {
+                converse.connection.roster.add(jid, name, [], function (iq) {
+                    converse.connection.roster.subscribe(jid, null, converse.xmppstatus.get('fullname'));
+                });
             }
         },
         'chats': {
