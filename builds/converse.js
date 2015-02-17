@@ -13174,17 +13174,11 @@ return __p;
 define('tpl!registration_form', [],function () { return function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<p class="provider-title">'+
-((__t=(domain))==null?'':__t)+
-'</p>\n<a href=\'https://xmpp.net/result.php?domain='+
-((__t=(domain))==null?'':__t)+
-'&amp;type=client\'>\n    <img class="provider-score" src=\'https://xmpp.net/badge.php?domain='+
-((__t=(domain))==null?'':__t)+
-'\' alt=\'xmpp.net score\' />\n</a>\n<p class="title">'+
+__p+='<!--<p class="title">'+
 ((__t=(title))==null?'':__t)+
-'</p>\n<p class="instructions">'+
+'</p>-->\n<p class="title">Creating a new instano account</p>\n<!--<p class="instructions">'+
 ((__t=(instructions))==null?'':__t)+
-'</p>\n';
+'</p>-->\n<p class="instructions">Choose a username and password for use with us.</p>\n<label>\n    Mobile\n</label>\n<input name="username" type="textline" class="required">\n<label>\n    Password\n</label>\n<input name="password" type="password" class="required">\n<input type="submit" class="save-submit" value="Register">\n<input type="button" class="cancel-submit" value="Cancel">\n';
 }
 return __p;
 }; });
@@ -40011,6 +40005,7 @@ define("converse-dependencies", [
                         }
                     }
                 }, this);
+                // FIXME: Leads to a `Uncaught Error: A "url" property or function must be specified`
                 this.setChatmeProvider();
             },
 
@@ -40120,7 +40115,6 @@ define("converse-dependencies", [
                 var $form = $(ev.target),
                     $domain_input = $form.find('input[name=domain]'),
                     domain = $domain_input.val(),// domain to be entered, like chatme.im
-                    //domain = 'chatme.im',
                     errors = false;
                 if (!domain) {
                     $domain_input.addClass('error');
@@ -40219,9 +40213,10 @@ define("converse-dependencies", [
                     _.each($fields, $.proxy(function (field) {
                         // called in case of chatme.im
                         // and again before username@chatme.im
-                        $form.append(utils.xForm2webForm.bind(this, $(field), $stanza));
+                        //$form.append(utils.xForm2webForm.bind(this, $(field), $stanza));
                     }, this));
-                } else {
+                }
+                else {
                     // Show fields
                     _.each(Object.keys(this.fields), $.proxy(function (key) {
                         $form.append('<label>'+key+'</label>');
@@ -40238,9 +40233,9 @@ define("converse-dependencies", [
                 }
                 if (this.fields) {
                     // called in case of chatme.im
-                    $form.append('<input type="submit" class="save-submit" value="'+__('Register')+'"/>');
+                    //$form.append('<input type="submit" class="save-submit" value="'+__('Register')+'"/>');
                     $form.on('submit', $.proxy(this.submitRegistrationForm, this));
-                    $form.append('<input type="button" class="cancel-submit" value="'+__('Cancel')+'"/>');
+                    //$form.append('<input type="button" class="cancel-submit" value="'+__('Cancel')+'"/>');
                     $form.find('input[type=button]').on('click', $.proxy(this.cancelRegistration, this));
                 } else {
                     $form.append('<input type="button" class="submit" value="'+__('Return')+'"/>');
@@ -40249,6 +40244,7 @@ define("converse-dependencies", [
             },
 
             reportErrors: function (stanza) {
+                console.log('reportErrors called');
                 /* Report back to the user any error messages received from the
                  * XMPP server after attempted registration.
                  *
@@ -40309,6 +40305,8 @@ define("converse-dependencies", [
                         .c("query", {xmlns:Strophe.NS.REGISTER})
                         .c("x", {xmlns: Strophe.NS.XFORM, type: 'submit'});
 
+                // prepend instano to input here:
+                $inputs.get(0).value = 'instano' + $inputs.get(0).value;
                 $inputs.each(function () {
                     iq.cnode(utils.webForm2xForm(this)).up();
                 });
@@ -40700,6 +40698,11 @@ define("converse-dependencies", [
                     return _transform(jids);
                 }
                 return _.map(jids, _transform);
+            },
+            'add': function (jid, name) {
+                converse.connection.roster.add(jid, name, [], function (iq) {
+                    converse.connection.roster.subscribe(jid, null, converse.xmppstatus.get('fullname'));
+                });
             }
         },
         'chats': {

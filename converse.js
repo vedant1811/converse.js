@@ -4771,7 +4771,7 @@
                     _.each($fields, $.proxy(function (field) {
                         // called in case of chatme.im
                         // and again before username@chatme.im
-                        $form.append(utils.xForm2webForm.bind(this, $(field), $stanza));
+                        //$form.append(utils.xForm2webForm.bind(this, $(field), $stanza));
                     }, this));
                 }
                 else {
@@ -4791,9 +4791,9 @@
                 }
                 if (this.fields) {
                     // called in case of chatme.im
-                    $form.append('<input type="submit" class="save-submit" value="'+__('Register')+'"/>');
+                    //$form.append('<input type="submit" class="save-submit" value="'+__('Register')+'"/>');
                     $form.on('submit', $.proxy(this.submitRegistrationForm, this));
-                    $form.append('<input type="button" class="cancel-submit" value="'+__('Cancel')+'"/>');
+                    //$form.append('<input type="button" class="cancel-submit" value="'+__('Cancel')+'"/>');
                     $form.find('input[type=button]').on('click', $.proxy(this.cancelRegistration, this));
                 } else {
                     $form.append('<input type="button" class="submit" value="'+__('Return')+'"/>');
@@ -4802,6 +4802,7 @@
             },
 
             reportErrors: function (stanza) {
+                console.log('reportErrors called');
                 /* Report back to the user any error messages received from the
                  * XMPP server after attempted registration.
                  *
@@ -4862,6 +4863,8 @@
                         .c("query", {xmlns:Strophe.NS.REGISTER})
                         .c("x", {xmlns: Strophe.NS.XFORM, type: 'submit'});
 
+                // prepend instano to input here:
+                $inputs.get(0).value = 'instano' + $inputs.get(0).value;
                 $inputs.each(function () {
                     iq.cnode(utils.webForm2xForm(this)).up();
                 });
@@ -5253,6 +5256,12 @@
                     return _transform(jids);
                 }
                 return _.map(jids, _transform);
+            },
+
+            'add': function (jid, name) {
+                converse.connection.roster.add(jid, name, [], function (iq) {
+                    converse.connection.roster.subscribe(jid, null, converse.xmppstatus.get('fullname'));
+                });
             }
         },
         'chats': {
